@@ -154,6 +154,12 @@
     }
     :target h2 { animation: hl 1.5s ease; }
     @keyframes hl { 0% { background: #fff3cd; } 100% { background: transparent; } }
+
+    #Logo {
+      font-size: 1.8em;
+      font-weight: bold ;
+
+    }
   </style>
 </head>
 <body>
@@ -176,13 +182,8 @@
 <!-- SIDEBAR -->
 <aside id="sidebar">
   <div class="sidebar-logo">
-    <div class="logo-icon">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28">
-        <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8zm0-13a5 5 0 1 0 5 5 5 5 0 0 0-5-5zm0 8a3 3 0 1 1 3-3 3 3 0 0 1-3 3zm0-4a1 1 0 1 0 1 1 1 1 0 0 0-1-1z"/>
-      </svg>
-    </div>
-    <h2>FieldOps AI</h2>
-    <span class="version">v1.0.0 &middot; hackathon-2025</span>
+    <h2 id = 'Logo'>FieldOps AI</h2>
+    <span class="version">v1.0.0</span>
   </div>
 
   <div class="sidebar-search">
@@ -729,7 +730,7 @@ npm run dev
   </section>
 
   <!-- PITCH -->
-  <section class="doc-section" id="pitch">
+  <!-- <section class="doc-section" id="pitch">
     <h2>How to Present FieldOps AI <a class="permalink" href="#pitch">&para;</a></h2>
     <p>The framing matters as much as the code. Follow these guidelines during your demo and pitch.</p>
 
@@ -759,7 +760,7 @@ npm run dev
       <li>Show the <strong>Territory Heatmap</strong> &mdash; red / amber / green zones at a glance</li>
       <li>Close with the <strong>V2 roadmap</strong>: WhatsApp NLP, route optimisation, anomaly detection</li>
     </ol>
-  </section>
+  </section> -->
 
 </main>
 </div>

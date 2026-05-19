@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FieldOps AI — Documentation</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Source+Code+Pro:wght@400;600&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg:           #fcfcfc;
+      --sidebar-bg:   #f4f4f2;
+      --sidebar-w:    230px;
+      --border:       #d8d8d4;
+      --accent:       #2563a8;
+      --accent-hover: #17437a;
+      --text:         #1a1a1a;
+      --muted:        #555552;
+      --heading:      #111;
+      --code-bg:      #f0f0ec;
+      --tag-bg:       #e8f0fb;
+      --tag-color:    #1d4ed8;
+      --top-bar:      #1b2e3c;
+      --top-bar-text: #ecf0f1;
+      --section-line: #b0b0aa;
+      --font-body:    'Source Sans 3', sans-serif;
+      --font-serif:   'Lora', Georgia, serif;
+      --font-mono:    'Source Code Pro', 'Courier New', monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font-body); font-size: 15px; line-height: 1.72; color: var(--text); background: var(--bg); }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { color: var(--accent-hover); text-decoration: underline; }
+    code, kbd, samp, pre { font-family: var(--font-mono); font-size: 0.88em; }
+
+    /* TOP BAR */
+    #top-bar {
+      background: var(--top-bar); color: var(--top-bar-text);
+      padding: 0 1.5rem; height: 44px;
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 100;
+      border-bottom: 2px solid #0f1e2a;
+    }
+    #top-bar .brand { font-family: var(--font-serif); font-size: 1rem; font-weight: 600; color: #fff; }
+    #top-bar .brand span { color: #5bc4e8; }
+    #top-bar nav a { color: #bdc8d4; font-size: 0.82rem; margin-left: 1.4rem; transition: color 0.15s; }
+    #top-bar nav a:hover { color: #fff; text-decoration: none; }
+
+    /* SHELL */
+    #shell { display: flex; min-height: calc(100vh - 44px); }
+
+    /* SIDEBAR */
+    #sidebar {
+      width: var(--sidebar-w); flex-shrink: 0;
+      background: var(--sidebar-bg); border-right: 1px solid var(--border);
+      padding: 1.4rem 0 2rem;
+      position: sticky; top: 44px; height: calc(100vh - 44px); overflow-y: auto;
+    }
+    .sidebar-logo { display: flex; flex-direction: column; align-items: center; padding: 0 1rem 1rem; border-bottom: 1px solid var(--border); margin-bottom: 1rem; text-align: center; }
+    .sidebar-logo .logo-icon { width: 54px; height: 54px; background: var(--top-bar); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 0.6rem; }
+    .sidebar-logo .logo-icon svg { fill: #5bc4e8; }
+    .sidebar-logo h2 { font-family: var(--font-serif); font-size: 1rem; color: var(--heading); line-height: 1.3; }
+    .sidebar-logo .version { font-size: 0.72rem; color: var(--muted); font-family: var(--font-mono); margin-top: 2px; }
+    .sidebar-search { padding: 0 0.9rem 1rem; border-bottom: 1px solid var(--border); margin-bottom: 0.8rem; }
+    .sidebar-search label { display: block; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-bottom: 5px; }
+    .sidebar-search .search-row { display: flex; gap: 4px; }
+    .sidebar-search input { flex: 1; padding: 4px 7px; font-size: 0.82rem; border: 1px solid var(--border); border-radius: 3px; background: #fff; color: var(--text); font-family: var(--font-body); outline: none; }
+    .sidebar-search input:focus { border-color: var(--accent); }
+    .sidebar-search button { padding: 4px 10px; font-size: 0.78rem; background: var(--accent); color: #fff; border: none; border-radius: 3px; cursor: pointer; font-family: var(--font-body); }
+    .sidebar-search button:hover { background: var(--accent-hover); }
+    .sidebar-section-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); padding: 0.6rem 0.9rem 0.2rem; }
+    #sidebar ul { list-style: none; margin: 0 0 0.4rem; padding: 0; }
+    #sidebar ul li a { display: block; padding: 3px 0.9rem; font-size: 0.83rem; color: var(--accent); border-left: 2px solid transparent; transition: background 0.12s, border-color 0.12s; }
+    #sidebar ul li a:hover, #sidebar ul li a.active { background: #e6edf7; border-left-color: var(--accent); text-decoration: none; }
+    .sidebar-divider { border: none; border-top: 1px solid var(--border); margin: 0.6rem 0; }
+
+    /* CONTENT */
+    #content { flex: 1; padding: 2.2rem 3rem 4rem; max-width: 880px; min-width: 0; }
+    .page-header { border-bottom: 2px solid var(--border); padding-bottom: 1.1rem; margin-bottom: 2rem; }
+    .page-header h1 { font-family: var(--font-serif); font-size: 2rem; font-weight: 600; color: var(--heading); line-height: 1.25; }
+    .page-header .subtitle { font-size: 0.9rem; color: var(--muted); margin-top: 0.35rem; }
+    .page-header .meta-tags { margin-top: 0.7rem; display: flex; flex-wrap: wrap; gap: 6px; }
+    .tag { background: var(--tag-bg); color: var(--tag-color); font-size: 0.72rem; font-weight: 600; padding: 2px 8px; border-radius: 3px; font-family: var(--font-mono); border: 1px solid #c3d8f5; }
+    .intro-text { font-size: 0.94rem; color: var(--muted); margin-bottom: 2.2rem; border-left: 3px solid var(--accent); padding-left: 0.9rem; line-height: 1.8; }
+    .doc-section { margin-bottom: 2.6rem; }
+    .doc-section h2 { font-family: var(--font-serif); font-size: 1.28rem; font-weight: 600; color: var(--heading); margin-bottom: 0.4rem; padding-bottom: 0.3rem; border-bottom: 1px solid var(--section-line); display: flex; align-items: center; gap: 0.45rem; }
+    .doc-section h2 .permalink { font-size: 0.75rem; color: #aaa; font-family: var(--font-mono); font-weight: 400; opacity: 0; transition: opacity 0.15s; }
+    .doc-section h2:hover .permalink { opacity: 1; }
+    .doc-section > p { font-size: 0.9rem; color: var(--muted); margin-bottom: 0.8rem; }
+    .doc-section h3 { font-family: var(--font-serif); font-size: 1.05rem; color: var(--heading); margin: 1.3rem 0 0.35rem; }
+    .doc-section h4 { font-size: 0.84rem; font-weight: 700; color: var(--heading); text-transform: uppercase; letter-spacing: 0.05em; margin: 1rem 0 0.3rem; }
+    .doc-section ul.link-list { list-style: disc; padding-left: 1.5rem; margin: 0; }
+    .doc-section ul.link-list li { margin: 4px 0; font-size: 0.9rem; }
+    .doc-section ul.link-list li a { font-size: 0.9rem; }
+    .doc-section ul.link-list ul { list-style: circle; padding-left: 1.4rem; margin-top: 3px; }
+    .see-also { font-size: 0.85rem; color: var(--muted); margin-top: 0.6rem; }
+
+    pre.code-block { background: var(--code-bg); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 4px; padding: 1rem 1.1rem; overflow-x: auto; font-size: 0.82rem; line-height: 1.65; margin: 0.8rem 0 1rem; color: #1a1a1a; }
+    p code, li code, td code { background: var(--code-bg); border: 1px solid #ddd; border-radius: 3px; padding: 1px 5px; color: #b5002b; }
+
+    .admonition { border-left: 4px solid var(--accent); background: #eef4fb; padding: 0.75rem 1rem; border-radius: 0 4px 4px 0; margin: 1rem 0; font-size: 0.88rem; }
+    .admonition.warning { border-left-color: #e5a800; background: #fdf8ec; }
+    .admonition.important { border-left-color: #d32f2f; background: #fef2f2; }
+    .admonition.tip { border-left-color: #15803d; background: #f0fdf4; }
+    .admonition strong { display: block; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px; color: var(--accent); }
+    .admonition.warning strong { color: #b38200; }
+    .admonition.important strong { color: #c62828; }
+    .admonition.tip strong { color: #15803d; }
+
+    table.doc-table { width: 100%; border-collapse: collapse; font-size: 0.87rem; margin: 1rem 0; }
+    table.doc-table th { background: var(--sidebar-bg); border: 1px solid var(--border); padding: 7px 10px; text-align: left; font-weight: 700; color: var(--heading); }
+    table.doc-table td { border: 1px solid var(--border); padding: 6px 10px; color: var(--muted); vertical-align: top; }
+    table.doc-table tr:nth-child(even) td { background: #f9f9f7; }
+
+    /* Formula box */
+    .formula-box { background: #f5f8ff; border: 1px solid #c3d3f0; border-left: 4px solid var(--accent); border-radius: 4px; padding: 0.9rem 1.2rem; font-family: var(--font-mono); font-size: 0.85rem; line-height: 1.9; margin: 0.9rem 0 1rem; color: #1e293b; }
+    .formula-box .weight { display: inline-block; background: var(--top-bar); color: #5bc4e8; font-size: 0.72rem; padding: 1px 6px; border-radius: 3px; margin-left: 4px; font-weight: 600; }
+
+    /* Role badges */
+    .role-badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 0.73rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; margin-left: 8px; vertical-align: middle; }
+    .role-badge.manager { background: #dbeafe; color: #1e40af; }
+    .role-badge.rep     { background: #d1fae5; color: #065f46; }
+
+    /* Status pills */
+    .pill { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 0.72rem; font-weight: 700; }
+    .pill.red    { background: #fee2e2; color: #991b1b; }
+    .pill.green  { background: #dcfce7; color: #166534; }
+    .pill.amber  { background: #fef3c7; color: #92400e; }
+
+    /* Card grid */
+    .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin: 0.8rem 0 1rem; }
+    .info-card { background: var(--sidebar-bg); border: 1px solid var(--border); border-radius: 5px; padding: 0.7rem 0.9rem; }
+    .info-card .card-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-bottom: 3px; }
+    .info-card .card-value { font-size: 0.88rem; color: var(--heading); }
+
+    /* Route list */
+    ol.route-list { list-style: decimal; padding-left: 1.5rem; margin: 0.5rem 0; }
+    ol.route-list li { font-size: 0.9rem; margin: 5px 0; color: var(--muted); }
+    ol.route-list li strong { color: var(--text); }
+
+    /* Footer */
+    #footer { background: var(--sidebar-bg); border-top: 1px solid var(--border); padding: 0.9rem 3rem; font-size: 0.78rem; color: var(--muted); display: flex; align-items: center; justify-content: space-between; }
+    #footer a { color: var(--accent); }
+
+    @media (max-width: 768px) {
+      #sidebar { display: none; }
+      #content { padding: 1.4rem 1.2rem 3rem; }
+      .card-grid { grid-template-columns: 1fr; }
+      #footer { flex-direction: column; gap: 4px; text-align: center; }
+    }
+    :target h2 { animation: hl 1.5s ease; }
+    @keyframes hl { 0% { background: #fff3cd; } 100% { background: transparent; } }
+  </style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<header id="top-bar">
+  <span class="brand">&#10216; <span>FieldOps AI</span> &#10217; Docs</span>
+  <nav>
+    <a href="#overview">Overview</a>
+    <a href="#core-flow">Core Flow</a>
+    <a href="#datasets">Datasets</a>
+    <a href="#priority-engine">Priority Engine</a>
+    <a href="#app-pages">App Pages</a>
+    <a href="#stack">Stack</a>
+  </nav>
+</header>
+
+<div id="shell">
+
+<!-- SIDEBAR -->
+<aside id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28">
+        <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8zm0-13a5 5 0 1 0 5 5 5 5 0 0 0-5-5zm0 8a3 3 0 1 1 3-3 3 3 0 0 1-3 3zm0-4a1 1 0 1 0 1 1 1 1 0 0 0-1-1z"/>
+      </svg>
+    </div>
+    <h2>FieldOps AI</h2>
+    <span class="version">v1.0.0 &middot; hackathon-2025</span>
+  </div>
+
+  <div class="sidebar-search">
+    <label>Quick Search</label>
+    <div class="search-row">
+      <input type="text" id="search-input" placeholder="Search docs&hellip;" onkeypress="if(event.key === 'Enter') performSearch(this.value)" />
+      <button onclick="performSearch(document.getElementById('search-input').value)">Go</button>
+    </div>
+  </div>
+
+  <div class="sidebar-section-label">Contents</div>
+  <ul id="nav-list">
+    <li><a href="#overview">Project Overview</a></li>
+    <li><a href="#users">User Roles</a></li>
+    <li><a href="#core-flow">Core App Flow</a></li>
+    <li><a href="#datasets">Datasets (V1)</a></li>
+    <li><a href="#database">Database Design</a></li>
+    <li><a href="#priority-engine">Priority Engine</a></li>
+    <li><a href="#app-pages">App Pages</a></li>
+  </ul>
+
+  <hr class="sidebar-divider" />
+
+  <ul>
+    <li><a href="#landing">Landing Page</a></li>
+    <li><a href="#manager-dashboard">Manager Dashboard</a></li>
+    <li><a href="#rep-dashboard">Rep Dashboard</a></li>
+    <li><a href="#retailer-detail">Retailer Details</a></li>
+    <li><a href="#heatmap">Territory Heatmap</a></li>
+  </ul>
+
+  <hr class="sidebar-divider" />
+
+  <ul>
+    <li><a href="#stack">Tech Stack</a></li>
+    <li><a href="#getting-started">Getting Started</a></li>
+    <li><a href="#future">Future Expansion</a></li>
+    <li><a href="#pitch">How to Present</a></li>
+  </ul>
+
+  <hr class="sidebar-divider" />
+  <div class="sidebar-section-label">This Page</div>
+  <ul><li><a href="#">Show Source</a></li></ul>
+</aside>
+
+<!-- MAIN CONTENT -->
+<main id="content">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <h1>FieldOps AI &mdash; Smart Rep Planning Dashboard</h1>
+    <p class="subtitle">An intelligent field-force optimization platform that transforms operational data into actionable territory recommendations.</p>
+    <div class="meta-tags">
+      <span class="tag">next.js</span>
+      <span class="tag">tailwind</span>
+      <span class="tag">shadcn/ui</span>
+      <span class="tag">recharts</span>
+      <span class="tag">postgresql</span>
+      <span class="tag">tanstack-table</span>
+      <span class="tag">hackathon-2025</span>
+    </div>
+  </div>
+
+  <p class="intro-text">
+    FieldOps AI is a <strong>decision-support system</strong> for field representatives and territory managers.
+    It ingests four operational datasets, computes a real-time priority score for every retailer, and
+    surfaces the most important actions each morning &mdash; so no rep walks into the field without a plan.
+    No heavy ML required; just smart, transparent, interpretable scoring.
+  </p>
+
+  <!-- OVERVIEW -->
+  <section class="doc-section" id="overview">
+    <h2>Project Overview <a class="permalink" href="#overview">&para;</a></h2>
+    <p>Field sales teams lose time visiting the wrong retailers at the wrong time. FieldOps AI eliminates that by processing four operational datasets offline, computing a weighted priority score for every retailer, and presenting ranked, route-optimised visit plans to each rep &mdash; and a full territory view to each manager.</p>
+    <ul class="link-list">
+      <li><a href="#users">User roles &mdash; Manager &amp; Field Rep</a></li>
+      <li><a href="#core-flow">Core application flow (4 steps)</a></li>
+      <li><a href="#datasets">Datasets used in V1</a></li>
+      <li><a href="#priority-engine">Priority scoring engine</a></li>
+      <li><a href="#app-pages">All application pages</a></li>
+    </ul>
+  </section>
+
+  <!-- USER ROLES -->
+  <section class="doc-section" id="users">
+    <h2>User Roles <a class="permalink" href="#users">&para;</a></h2>
+    <p>The platform serves two distinct user personas, each with a dedicated dashboard.</p>
+
+    <h3>Manager <span class="role-badge manager">Manager</span></h3>
+    <p>Operates at the territory level; needs a helicopter view of all reps and all retailers.</p>
+    <ul class="link-list">
+      <li>Territory overview with heatmap</li>
+      <li>Critical stock alerts across all retailers</li>
+      <li>Rep activity &amp; coverage reports</li>
+      <li>Priority retailer list ranked by composite score</li>
+    </ul>
+
+    <h3>Field Rep <span class="role-badge rep">Field Rep</span></h3>
+    <p>Operates on the ground; needs a daily action list, not raw data.</p>
+    <ul class="link-list">
+      <li>Today&rsquo;s optimised visit plan (ordered list)</li>
+      <li>Per-retailer detail: inventory, sales trend, last visit</li>
+      <li>Recommended actions per stop</li>
+      <li>Route order suggestion</li>
+    </ul>
+  </section>
+
+  <!-- CORE FLOW -->
+  <section class="doc-section" id="core-flow">
+    <h2>Core Application Flow <a class="permalink" href="#core-flow">&para;</a></h2>
+    <p>The system is structured as a four-step pipeline. Steps 1 and 2 run offline (or on a scheduled cron job); Steps 3 and 4 are the live UI.</p>
+
+    <pre class="code-block">Input business data (CSV datasets)
+  → STEP 1: Data Processing   — compute trends, risk, inactivity, engagement
+  → STEP 2: Priority Engine   — score &amp; rank every retailer
+  → STEP 3: Dashboard         — surface insights to Manager
+  → STEP 4: Rep Plan          — deliver ordered visit route to Rep</pre>
+
+    <h3>Step 1 &mdash; Data Processing</h3>
+    <p>Datasets are processed offline (or via a cron job). For each retailer the pipeline produces four computed signals:</p>
+    <table class="doc-table">
+      <thead><tr><th>Signal</th><th>Source dataset</th><th>Formula / logic</th></tr></thead>
+      <tbody>
+        <tr><td><code>stock_risk</code></td><td>retailer_inventory_weekly.csv</td><td><code>current_stock / avg_daily_sales</code> &rarr; days to stockout</td></tr>
+        <tr><td><code>sales_velocity</code></td><td>retailer_pos.csv</td><td>weekly &amp; monthly sales rate; trend direction</td></tr>
+        <tr><td><code>days_since_visit</code></td><td>retailer_visit_log.csv</td><td>today &minus; last_visit_date</td></tr>
+        <tr><td><code>engagement_score</code></td><td>growers.csv</td><td>farm size + digital activity + high-value flag</td></tr>
+      </tbody>
+    </table>
+    <p>Results are persisted to PostgreSQL and consumed by the Priority Engine.</p>
+
+    <h3>Step 2 &mdash; Priority Engine</h3>
+    <p>See the <a href="#priority-engine">Priority Engine</a> section for the full scoring formula.</p>
+
+    <h3>Step 3 &mdash; Manager Dashboard</h3>
+    <p>The manager sees a live view: ranked retailers, territory heatmap, low-stock alerts, rep coverage, and visit efficiency metrics. Details at <a href="#manager-dashboard">Manager Dashboard &rarr;</a></p>
+
+    <h3>Step 4 &mdash; Rep Visit Plan</h3>
+    <p>Each rep sees their personalised daily route, sorted by priority score descending. Details at <a href="#rep-dashboard">Rep Dashboard &rarr;</a></p>
+  </section>
+
+  <!-- DATASETS -->
+  <section class="doc-section" id="datasets">
+    <h2>Datasets <a class="permalink" href="#datasets">&para;</a></h2>
+    <p>V1 uses exactly <strong>four datasets</strong>. That is sufficient to power every dashboard feature described in this document.</p>
+
+    <div class="admonition tip">
+      <strong>Tip</strong>
+      Two additional datasets (<code>whatsapp_message_log.csv</code> and <code>digital_funnel_weekly.csv</code>) are reserved for the V2 AI expansion phase. Do not integrate them in V1.
+    </div>
+
+    <!-- Dataset 1 -->
+    <h3>1. <code>retailer_inventory_weekly.csv</code></h3>
+    <p>Weekly snapshot of stock levels per retailer per product SKU. Primary source for stock alerts and stockout prediction.</p>
+    <h4>Computed fields</h4>
+    <pre class="code-block">days_to_stockout = current_stock / avg_daily_sales</pre>
+    <h4>Example insights generated</h4>
+    <pre class="code-block">"Retailer R22 will run out of stock in 5 days."
+"Retailer R07 has zero buffer — immediate replenishment required."</pre>
+    <h4>Feeds into</h4>
+    <ul class="link-list">
+      <li>Critical stock alert cards on Manager Dashboard</li>
+      <li><code>stock_risk</code> component of priority score <strong>(weight: 40 %)</strong></li>
+      <li>Retailer detail page &mdash; inventory section</li>
+    </ul>
+
+    <!-- Dataset 2 -->
+    <h3>2. <code>retailer_pos.csv</code></h3>
+    <p>Point-of-sale transaction data. Contains SKU-level sales per retailer per period. Used to assess retailer importance and product demand trends.</p>
+    <h4>Computed fields</h4>
+    <pre class="code-block">weekly_sales   = SUM(units_sold) over last 7 days
+monthly_sales  = SUM(units_sold) over last 30 days
+sales_velocity = weekly_sales / avg(weekly_sales across all retailers)</pre>
+    <h4>Example insights generated</h4>
+    <pre class="code-block">"Retailer R41 has unusually high fungicide demand — possible emerging outbreak event."
+"Retailer R88 — sales down 34 % vs prior month."</pre>
+    <h4>Feeds into</h4>
+    <ul class="link-list">
+      <li>Sales trend charts on Manager Dashboard</li>
+      <li><code>sales_velocity</code> component of priority score <strong>(weight: 30 %)</strong></li>
+      <li>Retailer detail page &mdash; sales trend section</li>
+    </ul>
+
+    <!-- Dataset 3 -->
+    <h3>3. <code>retailer_visit_log.csv</code></h3>
+    <p>Timestamped log of all rep visits per retailer. Used to identify neglected retailers and measure rep coverage.</p>
+    <h4>Computed fields</h4>
+    <pre class="code-block">days_since_last_visit = today - MAX(visit_date) per retailer
+visit_frequency       = COUNT(visits) over last 90 days</pre>
+    <h4>Example insights generated</h4>
+    <pre class="code-block">"Retailer R19 hasn't been visited in 17 days."
+"Zone 4B has had zero rep activity in the past 3 weeks."</pre>
+    <h4>Feeds into</h4>
+    <ul class="link-list">
+      <li>Inactive Territory alerts on Manager Dashboard</li>
+      <li><code>days_since_visit</code> component of priority score <strong>(weight: 20 %)</strong></li>
+      <li>Rep activity table</li>
+    </ul>
+
+    <!-- Dataset 4 -->
+    <h3>4. <code>growers.csv</code></h3>
+    <p>Master list of growers linked to retailers. Contains farm size, region, and digital engagement signals. Used for grower segmentation and engagement scoring.</p>
+    <h4>Computed fields</h4>
+    <pre class="code-block">high_value_grower = farm_size &gt; 50 acres AND revenue_tier == "A"
+digitally_engaged = app_logins_last_30d &gt; 3 OR whatsapp_active == true
+large_farm        = farm_size &gt; 100 acres
+engagement_score  = weighted_sum(high_value, digital, large_farm)</pre>
+    <h4>Feeds into</h4>
+    <ul class="link-list">
+      <li>Grower segmentation panel on Manager Dashboard</li>
+      <li><code>grower_engagement</code> component of priority score <strong>(weight: 10 %)</strong></li>
+    </ul>
+
+    <!-- Deferred -->
+    <h3>Datasets &mdash; Deferred to V2</h3>
+    <div class="admonition warning">
+      <strong>Out of Scope for V1</strong>
+      Do not integrate these datasets in the initial build.
+    </div>
+    <table class="doc-table">
+      <thead><tr><th>File</th><th>Planned V2 use</th></tr></thead>
+      <tbody>
+        <tr><td><code>whatsapp_message_log.csv</code></td><td>NLP sentiment analysis, conversation-based engagement signals</td></tr>
+        <tr><td><code>digital_funnel_weekly.csv</code></td><td>Digital adoption rate, funnel-stage progression per grower</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- DATABASE -->
+  <section class="doc-section" id="database">
+    <h2>Database Design <a class="permalink" href="#database">&para;</a></h2>
+    <p>FieldOps AI uses <strong>PostgreSQL</strong> as its primary store. Three tables hold all the computed data the dashboards need.</p>
+
+    <h3>Table: <code>retailers</code></h3>
+    <pre class="code-block">CREATE TABLE retailers (
+  id               SERIAL PRIMARY KEY,
+  name             TEXT NOT NULL,
+  location         TEXT,           -- lat/lng or zone label
+  priority_score   NUMERIC(5,2),  -- computed by Priority Engine
+  days_since_visit INTEGER,        -- from visit_log dataset
+  stock_risk       NUMERIC(5,2),  -- days_to_stockout normalised 0-100
+  sales_velocity   NUMERIC(5,2)   -- relative to territory average
+);</pre>
+
+    <h3>Table: <code>growers</code></h3>
+    <pre class="code-block">CREATE TABLE growers (
+  id               SERIAL PRIMARY KEY,
+  retailer_id      INTEGER REFERENCES retailers(id),
+  region           TEXT,
+  farm_size        NUMERIC(8,2),  -- acres
+  engagement_level TEXT           -- "high" | "medium" | "low"
+);</pre>
+
+    <h3>Table: <code>visits</code></h3>
+    <pre class="code-block">CREATE TABLE visits (
+  id           SERIAL PRIMARY KEY,
+  rep_id       INTEGER NOT NULL,
+  retailer_id  INTEGER REFERENCES retailers(id),
+  visit_date   DATE NOT NULL,
+  notes        TEXT
+);</pre>
+
+    <div class="admonition">
+      <strong>Note</strong>
+      Re-run the Priority Engine after every dataset refresh to keep <code>retailers.priority_score</code> current. In V1 this can be a nightly cron job.
+    </div>
+  </section>
+
+  <!-- PRIORITY ENGINE -->
+  <section class="doc-section" id="priority-engine">
+    <h2>Priority Engine &mdash; &ldquo;The AI&rdquo; <a class="permalink" href="#priority-engine">&para;</a></h2>
+    <p>The Priority Engine is the intelligence layer of FieldOps AI. It is a transparent, weighted scoring function &mdash; not a black-box model &mdash; which makes it auditable, explainable, and easy to tune without retraining.</p>
+
+    <div class="admonition tip">
+      <strong>Presentation framing</strong>
+      Do not say &ldquo;hardcoded logic.&rdquo; Present it as an <em>&ldquo;intelligent prioritization engine that dynamically weights operational signals to surface the highest-impact retailer visits.&rdquo;</em>
+    </div>
+
+    <h3>Scoring Formula</h3>
+    <div class="formula-box">
+      priority_score =<br />
+      &nbsp;&nbsp;( stock_risk        &times; <span class="weight">0.40</span> ) +<br />
+      &nbsp;&nbsp;( sales_velocity    &times; <span class="weight">0.30</span> ) +<br />
+      &nbsp;&nbsp;( days_since_visit  &times; <span class="weight">0.20</span> ) +<br />
+      &nbsp;&nbsp;( grower_engagement &times; <span class="weight">0.10</span> )
+    </div>
+
+    <h3>Weight rationale</h3>
+    <table class="doc-table">
+      <thead><tr><th>Signal</th><th>Weight</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><td><code>stock_risk</code></td><td><span class="pill red">40 %</span></td><td>A stockout is the highest-urgency event &mdash; it directly costs revenue and grower trust.</td></tr>
+        <tr><td><code>sales_velocity</code></td><td><span class="pill amber">30 %</span></td><td>High-velocity retailers need attention to prevent demand gaps; low velocity may signal relationship issues.</td></tr>
+        <tr><td><code>days_since_visit</code></td><td><span class="pill amber">20 %</span></td><td>Relationship decay is real &mdash; prolonged absence erodes brand loyalty and share of shelf.</td></tr>
+        <tr><td><code>grower_engagement</code></td><td><span class="pill green">10 %</span></td><td>High-value, digitally-engaged growers merit proactive rep attention.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Output query</h3>
+    <pre class="code-block">-- Sort descending — highest urgency first
+SELECT id, name, priority_score
+FROM   retailers
+ORDER  BY priority_score DESC
+LIMIT  10;</pre>
+    <p class="see-also">The score is written back to <code>retailers.priority_score</code> after each engine run and consumed directly by both dashboards.</p>
+  </section>
+
+  <!-- APP PAGES -->
+  <section class="doc-section" id="app-pages">
+    <h2>Application Pages <a class="permalink" href="#app-pages">&para;</a></h2>
+    <ul class="link-list">
+      <li><a href="#landing">Landing Page</a></li>
+      <li><a href="#manager-dashboard">Manager Dashboard</a> &mdash; most important page</li>
+      <li><a href="#rep-dashboard">Rep Dashboard</a></li>
+      <li><a href="#retailer-detail">Retailer Details Page</a></li>
+      <li><a href="#heatmap">Territory Heatmap</a></li>
+    </ul>
+  </section>
+
+  <!-- LANDING -->
+  <section class="doc-section" id="landing">
+    <h2>1. Landing Page <a class="permalink" href="#landing">&para;</a></h2>
+    <p>Entry point for all users. Kept deliberately simple &mdash; the value is in the dashboards.</p>
+    <ul class="link-list">
+      <li>Project tagline and 2&ndash;3 sentence elevator pitch</li>
+      <li>Live analytics preview widget (static mock data is fine)</li>
+      <li>Login buttons for <span class="role-badge manager">Manager</span> and <span class="role-badge rep">Field Rep</span></li>
+    </ul>
+  </section>
+
+  <!-- MANAGER DASHBOARD -->
+  <section class="doc-section" id="manager-dashboard">
+    <h2>2. Manager Dashboard <a class="permalink" href="#manager-dashboard">&para;</a></h2>
+    <p>The most important page in the application. Every element is derived from the four V1 datasets.</p>
+
+    <div class="admonition important">
+      <strong>Build Priority</strong>
+      Build this page first. It demonstrates the system&rsquo;s core value proposition and covers all four datasets in a single view.
+    </div>
+
+    <h3>Summary Cards &mdash; top row</h3>
+    <div class="card-grid">
+      <div class="info-card">
+        <div class="card-label">Critical Stock Alerts</div>
+        <div class="card-value">Retailers with &lt; 5 days of stock remaining</div>
+      </div>
+      <div class="info-card">
+        <div class="card-label">High Priority Retailers</div>
+        <div class="card-value">Top 10 by priority_score</div>
+      </div>
+      <div class="info-card">
+        <div class="card-label">Inactive Territories</div>
+        <div class="card-value">Zones with no rep visit in &gt; 14 days</div>
+      </div>
+      <div class="info-card">
+        <div class="card-label">Top Performing Reps</div>
+        <div class="card-value">Ranked by visit count &amp; retailer score improvement</div>
+      </div>
+    </div>
+
+    <h3>Charts &mdash; middle row</h3>
+    <ul class="link-list">
+      <li><strong>Sales Trend Chart</strong> &mdash; weekly_sales over time per territory (Recharts LineChart)</li>
+      <li><strong>Stock Risk Chart</strong> &mdash; histogram of days_to_stockout across all retailers (BarChart)</li>
+      <li><strong>Rep Activity Chart</strong> &mdash; visits per rep per week (BarChart)</li>
+    </ul>
+
+    <h3>Priority Table &mdash; bottom</h3>
+    <p>Built with TanStack Table v8. Sortable, filterable, paginated.</p>
+    <table class="doc-table">
+      <thead><tr><th>Column</th><th>Source field</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Retailer</td><td><code>retailers.name</code></td><td>Links to Retailer Detail page</td></tr>
+        <tr><td>Priority Score</td><td><code>retailers.priority_score</code></td><td>Colour-coded pill: red / amber / green</td></tr>
+        <tr><td>Stock Risk</td><td><code>retailers.stock_risk</code></td><td>Days to stockout</td></tr>
+        <tr><td>Last Visit</td><td><code>retailers.days_since_visit</code></td><td>Rendered as &ldquo;N days ago&rdquo;</td></tr>
+        <tr><td>Sales Velocity</td><td><code>retailers.sales_velocity</code></td><td>&uarr; / &darr; trend arrow</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- REP DASHBOARD -->
+  <section class="doc-section" id="rep-dashboard">
+    <h2>3. Rep Dashboard <a class="permalink" href="#rep-dashboard">&para;</a></h2>
+    <p>The Rep&rsquo;s daily operations screen. Renders when they log in each morning and tells them exactly where to go and in what order.</p>
+
+    <h3>Today&rsquo;s Visit Plan</h3>
+    <p>Retailers assigned to this rep, sorted by <code>priority_score</code> descending (highest urgency first).</p>
+    <ol class="route-list">
+      <li><strong>Retailer R12</strong> &mdash; <span class="pill red">Critical Stock</span> &middot; Score 94.2</li>
+      <li><strong>Retailer R77</strong> &mdash; <span class="pill amber">High Velocity</span> &middot; Score 81.7</li>
+      <li><strong>Retailer R91</strong> &mdash; <span class="pill amber">17 Days Unvisited</span> &middot; Score 76.3</li>
+    </ol>
+
+    <h3>Per-stop information</h3>
+    <ul class="link-list">
+      <li>Retailer name and location tag</li>
+      <li>Top alert (stock / sales / inactivity)</li>
+      <li>Recommended action: <em>&ldquo;Push fungicide restock&rdquo;</em> / <em>&ldquo;Relationship visit&rdquo;</em></li>
+      <li>Link &rarr; full Retailer Detail page</li>
+    </ul>
+
+    <h3>Alerts sidebar</h3>
+    <ul class="link-list">
+      <li>Any retailer in this rep&rsquo;s territory crossing the critical stock threshold today</li>
+      <li>Any retailer not visited in &gt; 21 days</li>
+    </ul>
+  </section>
+
+  <!-- RETAILER DETAIL -->
+  <section class="doc-section" id="retailer-detail">
+    <h2>4. Retailer Details Page <a class="permalink" href="#retailer-detail">&para;</a></h2>
+    <p>A single-retailer deep-dive. Accessible from both dashboards by clicking any retailer row or card.</p>
+    <ul class="link-list">
+      <li><strong>Inventory panel</strong> &mdash; current stock levels, days_to_stockout progress bar</li>
+      <li><strong>Sales trend chart</strong> &mdash; last 8 weeks (Recharts AreaChart)</li>
+      <li><strong>Visit history</strong> &mdash; last 5 visits with rep name and date</li>
+      <li><strong>Priority score breakdown</strong> &mdash; radar chart showing the four signal components</li>
+      <li><strong>Grower summary</strong> &mdash; linked growers, farm sizes, engagement levels</li>
+      <li><strong>Recommended action card</strong> &mdash; auto-generated from the highest-risk signal</li>
+    </ul>
+  </section>
+
+  <!-- HEATMAP -->
+  <section class="doc-section" id="heatmap">
+    <h2>5. Territory Heatmap <a class="permalink" href="#heatmap">&para;</a></h2>
+    <p>Optional but high-impact. Even a simplified implementation significantly elevates the hackathon presentation.</p>
+
+    <div class="admonition tip">
+      <strong>Hackathon tip</strong>
+      A static SVG map with coloured circles per zone looks professional and takes ~2 hours to build. Add Leaflet.js only if time allows.
+    </div>
+
+    <table class="doc-table">
+      <thead><tr><th>Colour</th><th>Meaning</th><th>Condition</th></tr></thead>
+      <tbody>
+        <tr><td><span class="pill red">Red</span></td><td>Urgent &mdash; immediate rep visit needed</td><td>priority_score &gt; 80 OR days_to_stockout &lt; 5</td></tr>
+        <tr><td><span class="pill amber">Amber</span></td><td>Watch &mdash; visit within 3 days</td><td>priority_score 50&ndash;80 OR days_since_visit &gt; 14</td></tr>
+        <tr><td><span class="pill green">Green</span></td><td>Healthy &mdash; no immediate action</td><td>priority_score &lt; 50 AND stock &gt; 10 days</td></tr>
+      </tbody>
+    </table>
+
+    <ul class="link-list">
+      <li>V1: SVG zone map with coloured markers per zone</li>
+      <li>V2: Leaflet.js with real lat/lng from <code>retailers.location</code></li>
+    </ul>
+  </section>
+
+  <!-- TECH STACK -->
+  <section class="doc-section" id="stack">
+    <h2>Tech Stack <a class="permalink" href="#stack">&para;</a></h2>
+    <p>Chosen for speed of development, ecosystem maturity, and presentation quality.</p>
+    <table class="doc-table">
+      <thead><tr><th>Layer</th><th>Technology</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td>Framework</td><td><code>Next.js 14 (App Router)</code></td><td>Routing, SSR, API route handlers</td></tr>
+        <tr><td>Styling</td><td><code>Tailwind CSS</code></td><td>Utility-first CSS &mdash; fast, consistent UI</td></tr>
+        <tr><td>Components</td><td><code>shadcn/ui</code></td><td>Accessible primitives: cards, tables, badges</td></tr>
+        <tr><td>Charts</td><td><code>Recharts</code></td><td>Line, Bar, Area, Radar charts &mdash; React-native</td></tr>
+        <tr><td>Tables</td><td><code>TanStack Table v8</code></td><td>Sortable, filterable, paginated data tables</td></tr>
+        <tr><td>Database</td><td><code>PostgreSQL 16</code></td><td>Primary store for all computed retailer data</td></tr>
+        <tr><td>ORM</td><td><code>Drizzle ORM</code></td><td>Type-safe DB queries from Next.js route handlers</td></tr>
+        <tr><td>Maps (V2)</td><td><code>Leaflet.js</code></td><td>Territory heatmap with real coordinates</td></tr>
+      </tbody>
+    </table>
+
+    <h3>API routes</h3>
+    <pre class="code-block">app/
+  api/
+    retailers/
+      route.ts          ← GET /api/retailers        (priority-ranked list)
+    retailers/[id]/
+      route.ts          ← GET /api/retailers/:id    (single retailer detail)
+    reps/[id]/plan/
+      route.ts          ← GET /api/reps/:id/plan    (today's route for rep)
+    alerts/
+      route.ts          ← GET /api/alerts           (critical stock + inactive)</pre>
+  </section>
+
+  <!-- GETTING STARTED -->
+  <section class="doc-section" id="getting-started">
+    <h2>Getting Started <a class="permalink" href="#getting-started">&para;</a></h2>
+
+    <h3>Prerequisites</h3>
+    <ul class="link-list">
+      <li>Node.js &ge; 18</li>
+      <li>PostgreSQL 16 (local install or Docker)</li>
+      <li>The four V1 CSV datasets placed in <code>/data/</code></li>
+    </ul>
+
+    <h3>Installation</h3>
+    <pre class="code-block"># 1. Clone the repository
+git clone https://github.com/your-org/fieldops-ai.git
+cd fieldops-ai
+
+# 2. Install dependencies
+npm install
+
+# 3. Configure environment variables
+cp .env.example .env.local
+# Open .env.local and fill in DATABASE_URL and NEXTAUTH_SECRET
+
+# 4. Apply the database schema
+npm run db:migrate
+
+# 5. Process CSV datasets and seed the database
+npm run data:process
+
+# 6. Start the development server
+npm run dev
+# → http://localhost:3000</pre>
+
+    <div class="admonition">
+      <strong>Note</strong>
+      <code>npm run data:process</code> reads the four CSV files from <code>/data/</code>,
+      computes all derived signals (stock_risk, sales_velocity, days_since_visit, engagement_score),
+      runs the Priority Engine, and writes results to PostgreSQL.
+      Re-run this command whenever the CSVs are refreshed.
+    </div>
+
+    <h3>Environment variables</h3>
+    <table class="doc-table">
+      <thead><tr><th>Variable</th><th>Required</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>DATABASE_URL</code></td><td>Yes</td><td>PostgreSQL connection string</td></tr>
+        <tr><td><code>NEXTAUTH_SECRET</code></td><td>Yes</td><td>Session signing secret (min 32 chars)</td></tr>
+        <tr><td><code>NEXT_PUBLIC_APP_URL</code></td><td>No</td><td>Base URL for OAuth callbacks</td></tr>
+        <tr><td><code>DATA_DIR</code></td><td>No</td><td>Override default <code>/data/</code> path for CSVs</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- FUTURE -->
+  <section class="doc-section" id="future">
+    <h2>Future Expansion &mdash; V2 AI Features <a class="permalink" href="#future">&para;</a></h2>
+    <p>These features are out of scope for V1 but explicitly planned. Mention them during your presentation to demonstrate forward-thinking product design.</p>
+    <ul class="link-list">
+      <li><strong>WhatsApp Sentiment Analysis</strong> &mdash; <code>whatsapp_message_log.csv</code> fed into an NLP classifier to detect retailer dissatisfaction signals early</li>
+      <li><strong>Digital Funnel Intelligence</strong> &mdash; <code>digital_funnel_weekly.csv</code> used to predict grower conversion likelihood and prioritise digital outreach</li>
+      <li><strong>Route Optimisation</strong> &mdash; Leaflet + TSP algorithm to minimise travel distance across the day&rsquo;s visit list</li>
+      <li><strong>Anomaly Detection</strong> &mdash; automatically flag statistically unusual sales spikes (e.g. R41 fungicide demand surge)</li>
+      <li><strong>Rep Performance Prediction</strong> &mdash; forecast territory score improvement based on a proposed visit plan</li>
+    </ul>
+  </section>
+
+  <!-- PITCH -->
+  <section class="doc-section" id="pitch">
+    <h2>How to Present FieldOps AI <a class="permalink" href="#pitch">&para;</a></h2>
+    <p>The framing matters as much as the code. Follow these guidelines during your demo and pitch.</p>
+
+    <div class="admonition important">
+      <strong>Do NOT say</strong>
+      &ldquo;We hardcoded some logic to sort retailers.&rdquo;
+    </div>
+
+    <div class="admonition tip">
+      <strong>DO say</strong>
+      &ldquo;FieldOps AI is an intelligent field-force optimization platform that transforms operational data into actionable territory recommendations &mdash; enabling reps to always visit the right retailer, at the right time, for the right reason.&rdquo;
+    </div>
+
+    <h3>Key talking points</h3>
+    <ul class="link-list">
+      <li>The <strong>Priority Engine</strong> dynamically weights four operational signals &mdash; stock risk, sales velocity, recency of visit, and grower engagement &mdash; into a single, explainable score</li>
+      <li>The system processes real agrochemical datasets and surfaces insights that would otherwise require hours of manual spreadsheet analysis</li>
+      <li>The architecture is <strong>extensible</strong> &mdash; V2 will layer NLP-based sentiment from WhatsApp data and digital funnel intelligence on top of the same scoring framework</li>
+      <li>The UI is designed to feel enterprise-grade: clean, data-driven, and decision-focused</li>
+    </ul>
+
+    <h3>Suggested demo order</h3>
+    <ol class="route-list">
+      <li>Land on the <strong>Manager Dashboard</strong> &mdash; highlight the critical alert cards and the priority-sorted table</li>
+      <li>Click a red retailer row &rarr; open <strong>Retailer Detail</strong> page and walk through the score breakdown radar chart</li>
+      <li>Switch to the <strong>Rep view</strong> &mdash; show today&rsquo;s ordered visit plan and recommended actions</li>
+      <li>Show the <strong>Territory Heatmap</strong> &mdash; red / amber / green zones at a glance</li>
+      <li>Close with the <strong>V2 roadmap</strong>: WhatsApp NLP, route optimisation, anomaly detection</li>
+    </ol>
+  </section>
+
+</main>
+</div>
+
+<!-- FOOTER -->
+<footer id="footer">
+  <span>&copy; 2025 FieldOps AI Team &mdash; Built at [Hackathon Name].</span>
+  <span>Documentation format inspired by <a href="https://docs.kernel.org/" target="_blank">The Linux Kernel Docs</a></span>
+</footer>
+
+<script>
+  /**
+   * performSearch(query)
+   * ----------------------------------------------------------------
+   * Full page content search.
+   *
+   * HOW IT WORKS:
+   *   Uses the browser's built-in window.find() to search and highlight
+   *   text within the entire page document.
+   *
+   * @param {string} query - Raw text from the search input.
+   */
+  function performSearch(query) {
+    const q = query.trim();
+    if (q) {
+      // Use the browser's built-in find functionality
+      window.find(q, false, false, true, false, false, true);
+    }
+  }
+
+  /**
+   * IntersectionObserver — active sidebar link highlighting
+   * ----------------------------------------------------------------
+   * Watches each <section class="doc-section"> element.
+   *
+   * HOW IT WORKS:
+   *   - The rootMargin '-20% 0px -70% 0px' means a section is considered
+   *     "in view" when its top edge sits between 20 % and 30 % down the
+   *     visible viewport height.
+   *   - When a section enters that zone:
+   *       a. All sidebar <a> elements lose the 'active' class.
+   *       b. The sidebar link whose href == '#<section-id>' gains 'active'.
+   *   - The CSS .active rule draws a blue left border on that link,
+   *     mirroring the scroll-tracking behaviour on docs.kernel.org.
+   *
+   * WHY IntersectionObserver:
+   *   It fires only at threshold crossings (not on every scroll pixel),
+   *   making it far more performant than a scroll event listener.
+   */
+  const sections = document.querySelectorAll('section.doc-section');
+  const navLinks = document.querySelectorAll('#sidebar ul li a');
+
+  const observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        navLinks.forEach(function(l) { l.classList.remove('active'); });
+
+        const id   = entry.target.getAttribute('id');
+        const link = document.querySelector('#sidebar a[href="#' + id + '"]');
+        if (link) link.classList.add('active');
+      }
+    });
+  }, {
+    rootMargin: '-20% 0px -70% 0px'   // section "active" when ~30% into view
+  });
+
+  sections.forEach(function(s) { observer.observe(s); });
+</script>
+
+</body>
+</html>
